@@ -12,11 +12,11 @@ class AppmetricaSdk {
 
   factory AppmetricaSdk() {
     if (_instance == null) {
-      _instance = AppmetricaSdk.private(
-          const MethodChannel('emallstudio.com/appmetrica_sdk'));
+      _instance = AppmetricaSdk.private(const MethodChannel('emallstudio.com/appmetrica_sdk'));
     }
     return _instance!;
   }
+
   AppmetricaSdk.private(this._channel);
 
   /// Initializes the library in an application with given parameters.
@@ -49,8 +49,7 @@ class AppmetricaSdk {
   }
 
   /// Sends an event with [name] and message as a set of [attributes] to the AppMetrica server.
-  Future<void> reportEvent(
-      {required String name, Map<String, dynamic>? attributes}) async {
+  Future<void> reportEvent({required String name, Map<String, dynamic>? attributes}) async {
     if (_apiKey == null) {
       throw 'The API key is not set';
     }
@@ -61,52 +60,44 @@ class AppmetricaSdk {
   }
 
   /// Sends custom string user profile attribute with the given [key] and [value] to the AppMetrica server.
-  Future<void> reportUserProfileCustomString(
-      {required String key, String? value}) async {
+  Future<void> reportUserProfileCustomString({required String key, String? value}) async {
     if (_apiKey == null) {
       throw 'The API key is not set';
     }
-    await _channel
-        .invokeMethod<void>('reportUserProfileCustomString', <String, dynamic>{
+    await _channel.invokeMethod<void>('reportUserProfileCustomString', <String, dynamic>{
       'key': key,
       'value': value,
     });
   }
 
   /// Sends custom number user profile attribute with the given [key] and [value] to the AppMetrica server.
-  Future<void> reportUserProfileCustomNumber(
-      {required String key, double? value}) async {
+  Future<void> reportUserProfileCustomNumber({required String key, double? value}) async {
     if (_apiKey == null) {
       throw 'The API key is not set';
     }
-    await _channel
-        .invokeMethod<void>('reportUserProfileCustomNumber', <String, dynamic>{
+    await _channel.invokeMethod<void>('reportUserProfileCustomNumber', <String, dynamic>{
       'key': key,
       'value': value,
     });
   }
 
   /// Sends custom boolean user profile attribute with the given [key] and [value] to the AppMetrica server.
-  Future<void> reportUserProfileCustomBoolean(
-      {required String key, bool? value}) async {
+  Future<void> reportUserProfileCustomBoolean({required String key, bool? value}) async {
     if (_apiKey == null) {
       throw 'The API key is not set';
     }
-    await _channel
-        .invokeMethod<void>('reportUserProfileCustomBoolean', <String, dynamic>{
+    await _channel.invokeMethod<void>('reportUserProfileCustomBoolean', <String, dynamic>{
       'key': key,
       'value': value,
     });
   }
 
   /// Sends custom counter user profile attribute with the given [key] and [value] to the AppMetrica server.
-  Future<void> reportUserProfileCustomCounter(
-      {required String key, required double delta}) async {
+  Future<void> reportUserProfileCustomCounter({required String key, required double delta}) async {
     if (_apiKey == null) {
       throw 'The API key is not set';
     }
-    await _channel
-        .invokeMethod<void>('reportUserProfileCustomCounter', <String, dynamic>{
+    await _channel.invokeMethod<void>('reportUserProfileCustomCounter', <String, dynamic>{
       'key': key,
       'delta': delta,
     });
@@ -117,20 +108,17 @@ class AppmetricaSdk {
     if (_apiKey == null) {
       throw 'The API key is not set';
     }
-    await _channel
-        .invokeMethod<void>('reportUserProfileUserName', <String, dynamic>{
+    await _channel.invokeMethod<void>('reportUserProfileUserName', <String, dynamic>{
       'userName': userName,
     });
   }
 
   /// Sends predefined [notificationsEnabled] profile attribute to the AppMetrica server.
-  Future<void> reportUserProfileNotificationsEnabled(
-      {bool? notificationsEnabled}) async {
+  Future<void> reportUserProfileNotificationsEnabled({bool? notificationsEnabled}) async {
     if (_apiKey == null) {
       throw 'The API key is not set';
     }
-    await _channel.invokeMethod<void>(
-        'reportUserProfileNotificationsEnabled', <String, dynamic>{
+    await _channel.invokeMethod<void>('reportUserProfileNotificationsEnabled', <String, dynamic>{
       'notificationsEnabled': notificationsEnabled,
     });
   }
@@ -190,5 +178,23 @@ class AppmetricaSdk {
       'referral': referral,
     });
     return;
+  }
+
+  Future<dynamic> reportSetPurchase({
+    required String title,
+    required String courseId,
+    required double price,
+    String? currency,
+  }) async {
+    if (_apiKey == null) {
+      throw 'The API key is not set';
+    }
+
+    return await _channel.invokeMethod<String>('setPurchase', <String, dynamic>{
+      'courseId': courseId,
+      'title': title,
+      'price': price,
+      'currency': currency,
+    });
   }
 }

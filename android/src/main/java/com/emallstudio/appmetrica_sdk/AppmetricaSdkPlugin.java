@@ -4,15 +4,29 @@
 
 package com.emallstudio.appmetrica_sdk;
 
-import androidx.annotation.NonNull;
-
-import android.util.Log;
-import android.app.Activity;
+import android.annotation.TargetApi;
 import android.app.Application;
 import android.content.Context;
-import android.content.Intent;
+import android.os.Build;
+import android.util.Log;
 
-import android.util.SparseArray;
+import androidx.annotation.NonNull;
+
+import com.yandex.metrica.YandexMetrica;
+import com.yandex.metrica.YandexMetricaConfig;
+import com.yandex.metrica.ecommerce.ECommerceAmount;
+import com.yandex.metrica.ecommerce.ECommerceCartItem;
+import com.yandex.metrica.ecommerce.ECommerceEvent;
+import com.yandex.metrica.ecommerce.ECommerceOrder;
+import com.yandex.metrica.ecommerce.ECommercePrice;
+import com.yandex.metrica.ecommerce.ECommerceProduct;
+import com.yandex.metrica.profile.Attribute;
+import com.yandex.metrica.profile.UserProfile;
+
+import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
@@ -22,23 +36,19 @@ import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
 import io.flutter.plugin.common.PluginRegistry.Registrar;
-import io.flutter.view.FlutterView;
 
-import com.yandex.metrica.YandexMetrica;
-import com.yandex.metrica.YandexMetricaConfig;
-import com.yandex.metrica.profile.Attribute;
-import com.yandex.metrica.profile.StringAttribute;
-import com.yandex.metrica.profile.UserProfile;
-import com.yandex.metrica.profile.UserProfileUpdate;
-
-/** AppmetricaSdkPlugin */
+/**
+ * AppmetricaSdkPlugin
+ */
 public class AppmetricaSdkPlugin implements MethodCallHandler, FlutterPlugin {
     private static final String TAG = "AppmetricaSdkPlugin";
     private MethodChannel methodChannel;
     private Context context;
     private Application application;
 
-    /** Plugin registration for v1 embedder. */
+    /**
+     * Plugin registration for v1 embedder.
+     */
     public static void registerWith(Registrar registrar) {
         final AppmetricaSdkPlugin instance = new AppmetricaSdkPlugin();
         instance.onAttachedToEngine(registrar.context(), registrar.messenger());
@@ -46,14 +56,14 @@ public class AppmetricaSdkPlugin implements MethodCallHandler, FlutterPlugin {
 
     @Override
     public void onAttachedToEngine(@NonNull FlutterPluginBinding flutterPluginBinding) {
-      onAttachedToEngine(flutterPluginBinding.getApplicationContext(), flutterPluginBinding.getBinaryMessenger());
+        onAttachedToEngine(flutterPluginBinding.getApplicationContext(), flutterPluginBinding.getBinaryMessenger());
     }
 
     private void onAttachedToEngine(Context applicationContext, BinaryMessenger binaryMessenger) {
-      application = (Application) applicationContext;
-      context = applicationContext;
-      methodChannel = new MethodChannel(binaryMessenger, "emallstudio.com/appmetrica_sdk");
-      methodChannel.setMethodCallHandler(this);
+        application = (Application) applicationContext;
+        context = applicationContext;
+        methodChannel = new MethodChannel(binaryMessenger, "emallstudio.com/appmetrica_sdk");
+        methodChannel.setMethodCallHandler(this);
     }
 
     @Override
@@ -106,10 +116,13 @@ public class AppmetricaSdkPlugin implements MethodCallHandler, FlutterPlugin {
             case "reportReferralUrl":
                 handleReportReferralUrl(call, result);
                 break;
+            case "setPurchase":
+                handleSetPurchase(call, result);
+                break;
             default:
-              result.notImplemented();
-              break;
-          }
+                result.notImplemented();
+                break;
+        }
     }
 
     private void handleActivate(MethodCall call, Result result) {
@@ -346,4 +359,120 @@ public class AppmetricaSdkPlugin implements MethodCallHandler, FlutterPlugin {
 
         result.success(null);
     }
+
+    private void handleSetPurchase(MethodCall call, Result result) {
+        try {
+            Map<String, Object> arguments = (Map<String, Object>) call.arguments;
+            final String courseId = (String) arguments.get("courseId");
+            final String title = (String) arguments.get("title");
+            final Double price = (Double) arguments.get("price");
+            String currency = (String) arguments.get("currency");
+            Map<String, String> payload = new HashMap<>();
+
+            payload.put("userId", "40");
+            payload.put("email", "Medx@mknc.ru");
+
+            if(currency == null){
+                currency = "RUB";
+            }
+
+            assert courseId != null;
+            assert title != null;
+            assert price != null;
+
+            ECommercePrice actualPrice = new ECommercePrice(new ECommerceAmount(price, currency));
+
+            ECommercePrice originalPrice = new ECommercePrice(new ECommerceAmount(price, currency));
+
+            ECommerceProduct product = new ECommerceProduct(courseId)
+                    .setOriginalPrice(originalPrice)
+                    .setPayload(payload)
+                    .setName(title);
+
+            ECommerceCartItem addedItems1 = new ECommerceCartItem(product, actualPrice, 1);
+
+            ECommerceOrder order = new ECommerceOrder(courseId, Collections.singletonList(addedItems1));
+            ECommerceEvent beginCheckoutEvent = ECommerceEvent.beginCheckoutEvent(order);
+
+
+            YandexMetrica.reportECommerce(beginCheckoutEvent);
+            ECommerceEvent purchaseEvent = ECommerceEvent.purchaseEvent(order);
+
+            YandexMetrica.reportECommerce(purchaseEvent);
+            YandexMetrica.sendEventsBuffer();
+//            Map<String, Object> arguments = (Map<String, Object>) call.arguments;
+//            final String referral = (String) arguments.get("referral");
+//            Map<String, String> payload = new HashMap<>();
+//
+//            ECommercePrice actualPrice = new ECommercePrice(new ECommerceAmount(5999, "RUB"));
+//// Creating an originalPrice object.
+//            ECommercePrice originalPrice = new ECommercePrice(new ECommerceAmount(5999, "RUB"));
+//// Creating a product object. 
+//            ECommerceProduct product = new ECommerceProduct("104")
+//                    .setOriginalPrice(originalPrice)
+//                    .setName("5999"); // Optional.
+//
+//            ECommerceCartItem addedItems1 = new ECommerceCartItem(product, actualPrice, 1);
+//
+//            ECommerceOrder order = new ECommerceOrder("88528768", Collections.singletonList(addedItems1))
+//                    .setPayload(payload); // Optional.
+//            ECommerceEvent beginCheckoutEvent = ECommerceEvent.beginCheckoutEvent(order);
+//// Sending an e-commerce event.
+//
+//            YandexMetrica.reportECommerce(beginCheckoutEvent);
+//            ECommerceEvent purchaseEvent = ECommerceEvent.purchaseEvent(order);
+//
+//            YandexMetrica.reportECommerce(purchaseEvent);
+//            YandexMetrica.sendEventsBuffer();
+        } catch (Exception e) {
+            Log.e(TAG, e.getMessage(), e);
+            result.error("Error sets the ID of the user profile", e.getMessage(), null);
+        }
+
+        result.success(null);
+    }
+
+    private void handleSetPurchase1(MethodCall call, Result result) {
+        try {
+            Map<String, Object> arguments = (Map<String, Object>) call.arguments;
+            final String courseId = (String) arguments.get("courseId");
+            final String title = (String) arguments.get("title");
+            final Double price = (Double) arguments.get("price");
+            String currency = (String) arguments.get("currency");
+
+            if(currency == null){
+                currency = "RUB";
+            }
+
+            assert courseId != null;
+            assert title != null;
+            assert price != null;
+
+            ECommercePrice actualPrice = new ECommercePrice(new ECommerceAmount(price, currency));
+
+            ECommercePrice originalPrice = new ECommercePrice(new ECommerceAmount(price, currency));
+
+            ECommerceProduct product = new ECommerceProduct(courseId)
+                    .setOriginalPrice(originalPrice)
+                    .setName(title);
+
+            ECommerceCartItem addedItems1 = new ECommerceCartItem(product, actualPrice, 1);
+
+            ECommerceOrder order = new ECommerceOrder(courseId, Collections.singletonList(addedItems1));
+            ECommerceEvent beginCheckoutEvent = ECommerceEvent.beginCheckoutEvent(order);
+
+
+            YandexMetrica.reportECommerce(beginCheckoutEvent);
+            ECommerceEvent purchaseEvent = ECommerceEvent.purchaseEvent(order);
+
+            YandexMetrica.reportECommerce(purchaseEvent);
+            YandexMetrica.sendEventsBuffer();
+        } catch (Exception e) {
+            Log.e(TAG, e.getMessage(), e);
+            result.error("Error sets the ID of the user profile", e.getMessage(), null);
+        }
+
+        result.success(null);
+    }
+    
 }
