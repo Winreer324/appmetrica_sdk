@@ -366,19 +366,16 @@ public class AppmetricaSdkPlugin implements MethodCallHandler, FlutterPlugin {
             final String courseId = (String) arguments.get("courseId");
             final String title = (String) arguments.get("title");
             final Double price = (Double) arguments.get("price");
-            String currency = (String) arguments.get("currency");
+            final String currency = (String) arguments.get("currency");
             Map<String, String> payload = new HashMap<>();
 
-            payload.put("userId", "40");
-            payload.put("email", "Medx@mknc.ru");
-
-            if(currency == null){
-                currency = "RUB";
-            }
+//            payload.put("userId", "40");
+//            payload.put("email", "Medx@mknc.ru");
 
             assert courseId != null;
             assert title != null;
             assert price != null;
+            assert currency != null;
 
             ECommercePrice actualPrice = new ECommercePrice(new ECommerceAmount(price, currency));
 
@@ -389,9 +386,9 @@ public class AppmetricaSdkPlugin implements MethodCallHandler, FlutterPlugin {
                     .setPayload(payload)
                     .setName(title);
 
-            ECommerceCartItem addedItems1 = new ECommerceCartItem(product, actualPrice, 1);
+            ECommerceCartItem addedItems = new ECommerceCartItem(product, actualPrice, 1);
 
-            ECommerceOrder order = new ECommerceOrder(courseId, Collections.singletonList(addedItems1));
+            ECommerceOrder order = new ECommerceOrder(courseId, Collections.singletonList(addedItems));
             ECommerceEvent beginCheckoutEvent = ECommerceEvent.beginCheckoutEvent(order);
 
 
@@ -400,79 +397,12 @@ public class AppmetricaSdkPlugin implements MethodCallHandler, FlutterPlugin {
 
             YandexMetrica.reportECommerce(purchaseEvent);
             YandexMetrica.sendEventsBuffer();
-//            Map<String, Object> arguments = (Map<String, Object>) call.arguments;
-//            final String referral = (String) arguments.get("referral");
-//            Map<String, String> payload = new HashMap<>();
-//
-//            ECommercePrice actualPrice = new ECommercePrice(new ECommerceAmount(5999, "RUB"));
-//// Creating an originalPrice object.
-//            ECommercePrice originalPrice = new ECommercePrice(new ECommerceAmount(5999, "RUB"));
-//// Creating a product object. 
-//            ECommerceProduct product = new ECommerceProduct("104")
-//                    .setOriginalPrice(originalPrice)
-//                    .setName("5999"); // Optional.
-//
-//            ECommerceCartItem addedItems1 = new ECommerceCartItem(product, actualPrice, 1);
-//
-//            ECommerceOrder order = new ECommerceOrder("88528768", Collections.singletonList(addedItems1))
-//                    .setPayload(payload); // Optional.
-//            ECommerceEvent beginCheckoutEvent = ECommerceEvent.beginCheckoutEvent(order);
-//// Sending an e-commerce event.
-//
-//            YandexMetrica.reportECommerce(beginCheckoutEvent);
-//            ECommerceEvent purchaseEvent = ECommerceEvent.purchaseEvent(order);
-//
-//            YandexMetrica.reportECommerce(purchaseEvent);
-//            YandexMetrica.sendEventsBuffer();
+ 
         } catch (Exception e) {
             Log.e(TAG, e.getMessage(), e);
             result.error("Error sets the ID of the user profile", e.getMessage(), null);
         }
 
-        result.success(null);
-    }
-
-    private void handleSetPurchase1(MethodCall call, Result result) {
-        try {
-            Map<String, Object> arguments = (Map<String, Object>) call.arguments;
-            final String courseId = (String) arguments.get("courseId");
-            final String title = (String) arguments.get("title");
-            final Double price = (Double) arguments.get("price");
-            String currency = (String) arguments.get("currency");
-
-            if(currency == null){
-                currency = "RUB";
-            }
-
-            assert courseId != null;
-            assert title != null;
-            assert price != null;
-
-            ECommercePrice actualPrice = new ECommercePrice(new ECommerceAmount(price, currency));
-
-            ECommercePrice originalPrice = new ECommercePrice(new ECommerceAmount(price, currency));
-
-            ECommerceProduct product = new ECommerceProduct(courseId)
-                    .setOriginalPrice(originalPrice)
-                    .setName(title);
-
-            ECommerceCartItem addedItems1 = new ECommerceCartItem(product, actualPrice, 1);
-
-            ECommerceOrder order = new ECommerceOrder(courseId, Collections.singletonList(addedItems1));
-            ECommerceEvent beginCheckoutEvent = ECommerceEvent.beginCheckoutEvent(order);
-
-
-            YandexMetrica.reportECommerce(beginCheckoutEvent);
-            ECommerceEvent purchaseEvent = ECommerceEvent.purchaseEvent(order);
-
-            YandexMetrica.reportECommerce(purchaseEvent);
-            YandexMetrica.sendEventsBuffer();
-        } catch (Exception e) {
-            Log.e(TAG, e.getMessage(), e);
-            result.error("Error sets the ID of the user profile", e.getMessage(), null);
-        }
-
-        result.success(null);
-    }
-    
+        result.success("done send Purchase");
+    } 
 }

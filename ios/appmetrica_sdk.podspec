@@ -3,7 +3,7 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'appmetrica_sdk'
-  s.version          = '0.0.1'
+  s.version          = '0.0.2'
   s.summary          = 'A Flutter plugin for Yandex AppMetrica SDK.'
   s.description      = <<-DESC
   A Flutter plugin for Yandex AppMetrica SDK.
@@ -17,6 +17,6 @@ Pod::Spec.new do |s|
   s.dependency 'Flutter'
   s.dependency 'YandexMobileMetrica/Dynamic', '3.16.0'
 
-  s.ios.deployment_target = '8.0'
+  s.ios.deployment_target = '9.0'
 end
 

@@ -8,16 +8,20 @@ part of appmetrica_sdk;
 class AppmetricaSdk {
   String? _apiKey;
   final MethodChannel _channel;
+  final MethodChannel _customChannel;
   static AppmetricaSdk? _instance;
 
   factory AppmetricaSdk() {
     if (_instance == null) {
-      _instance = AppmetricaSdk.private(const MethodChannel('emallstudio.com/appmetrica_sdk'));
+      _instance = AppmetricaSdk.private(
+        const MethodChannel('emallstudio.com/appmetrica_sdk'),
+        const MethodChannel('com.medx.pro/appmetrica'),
+      );
     }
     return _instance!;
   }
 
-  AppmetricaSdk.private(this._channel);
+  AppmetricaSdk.private(this._channel, this._customChannel);
 
   /// Initializes the library in an application with given parameters.
   ///
@@ -35,6 +39,17 @@ class AppmetricaSdk {
       bool statisticsSending = true,
       bool crashReporting = true,
       int maxReportsInDatabaseCount = 1000}) async {
+    if (Platform.isIOS) {
+      final result = await _customChannel.invokeMethod<dynamic>('activate', <String, dynamic>{
+        'apiKey': apiKey,
+        'sessionTimeout': sessionTimeout,
+        'locationTracking': locationTracking,
+        'statisticsSending': statisticsSending,
+        'crashReporting': crashReporting,
+        'maxReportsInDatabaseCount': maxReportsInDatabaseCount,
+      });
+      print(result);
+    }
     await _channel.invokeMethod<void>('activate', <String, dynamic>{
       'apiKey': apiKey,
       'sessionTimeout': sessionTimeout,
@@ -189,8 +204,18 @@ class AppmetricaSdk {
     if (_apiKey == null) {
       throw 'The API key is not set';
     }
+    MethodChannel channel;
+    if (Platform.isIOS) {
+      channel = _customChannel;
+    } else {
+      channel = _channel;
+    }
 
-    return await _channel.invokeMethod<String>('setPurchase', <String, dynamic>{
+    if (currency == null) {
+      currency = "RUB";
+    }
+
+    return await channel.invokeMethod<String>('setPurchase', <String, dynamic>{
       'courseId': courseId,
       'title': title,
       'price': price,

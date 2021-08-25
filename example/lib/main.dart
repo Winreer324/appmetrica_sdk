@@ -132,9 +132,9 @@ class _MyAppState extends State<MyApp> {
                     /// be required to track some specific traffic
                     /// sources like Facebook.
                     final result = await AppmetricaSdk().reportSetPurchase(
-                      price: 600,
-                      title: 'Лучевая диагностика в остеологии',
-                      courseId: 109.toString(),
+                      price: 2600,
+                      title: 'Радиотерапия некоторых локализаций онкологических больных ios (v2)',
+                      courseId: 9999.toString(),
                     );
                     print('reportSetPurchase result $result');
                   },

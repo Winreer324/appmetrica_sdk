@@ -1,18 +1,19 @@
 PODS:
-  - appmetrica_sdk (0.0.1):
+  - appmetrica_sdk (0.0.2):
     - Flutter
-    - YandexMobileMetrica/Dynamic (= 3.14.0)
+    - YandexMobileMetrica/Dynamic (= 3.16.0)
   - Flutter (1.0.0)
-  - YandexMobileMetrica/Dynamic (3.14.0):
-    - YandexMobileMetrica/Dynamic/Core (= 3.14.0)
-    - YandexMobileMetrica/Dynamic/Crashes (= 3.14.0)
-  - YandexMobileMetrica/Dynamic/Core (3.14.0)
-  - YandexMobileMetrica/Dynamic/Crashes (3.14.0):
+  - YandexMobileMetrica/Dynamic (3.16.0):
+    - YandexMobileMetrica/Dynamic/Core (= 3.16.0)
+    - YandexMobileMetrica/Dynamic/Crashes (= 3.16.0)
+  - YandexMobileMetrica/Dynamic/Core (3.16.0)
+  - YandexMobileMetrica/Dynamic/Crashes (3.16.0):
     - YandexMobileMetrica/Dynamic/Core
 
 DEPENDENCIES:
   - appmetrica_sdk (from `.symlinks/plugins/appmetrica_sdk/ios`)
   - Flutter (from `Flutter`)
+  - YandexMobileMetrica/Dynamic (= 3.16.0)
 
 SPEC REPOS:
   trunk:
@@ -25,10 +26,10 @@ EXTERNAL SOURCES:
     :path: Flutter
 
 SPEC CHECKSUMS:
-  appmetrica_sdk: 16fd4649242a8b9ca1a6d4209d9f876d978e890d
-  Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
-  YandexMobileMetrica: a2dd4fd2f01ae7ae6850d786c443cb41fbbbea78
+  appmetrica_sdk: a75d10d739bb4a45f192e54d1b74e10ee5598dc5
+  Flutter: 434fef37c0980e73bb6479ef766c45957d4b510c
+  YandexMobileMetrica: 2ab55883ea552a4c4ea4516a3353ca0577a747cc
 
-PODFILE CHECKSUM: aafe91acc616949ddb318b77800a7f51bffa2a4c
+PODFILE CHECKSUM: c4cb0136f0737925cfa13b826446dc53e48672bd
 
-COCOAPODS: 1.8.3
+COCOAPODS: 1.11.0.beta.2
